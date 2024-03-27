@@ -1,0 +1,30 @@
+
+name: main-actions
+run-name: ${{ github.actor }} is running GitHub Actions
+on:
+  push:
+    branches: [ "develop", "master" ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  laravel-tests:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+      with:
+        php-version: '7.4'
+    - uses: actions/checkout@v3
+    - name: Copy .env
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+    - uses: php-actions/composer@v6   # This will auto run the command composer install by default
+      with:
+        php_version: '7.4'
+        version: '2.3.5'
+        # command: composer install   # If you want a custom composer install, write here
+    - name: Generate key
+      run: php artisan key:generate
+    - name: Run API Test
+      run: php artisan test
